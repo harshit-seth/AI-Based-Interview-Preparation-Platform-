@@ -1,0 +1,112 @@
+[
+  {
+    "id": "two-sum",
+    "title": "Two Sum",
+    "description": "Given an array of integers nums and an integer target, return indices of the two numbers that add up to target. You may assume that each input has exactly one solution, and you may not use the same element twice.",
+    "difficulty": "easy",
+    "topic": "arrays",
+    "example_input": "nums = [2, 7, 11, 15], target = 9",
+    "example_output": "[0, 1]",
+    "constraints": "2 <= nums.length <= 10^4, -10^9 <= nums[i] <= 10^9, -10^9 <= target <= 10^9",
+    "tags": ["hash-map", "array"]
+  },
+  {
+    "id": "valid-parentheses",
+    "title": "Valid Parentheses",
+    "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. A string is valid if brackets close in the correct order and every opening bracket has a matching closing bracket.",
+    "difficulty": "easy",
+    "topic": "stacks_queues",
+    "example_input": "s = \"()[]{}\"",
+    "example_output": "true",
+    "constraints": "1 <= s.length <= 10^4, s consists of parentheses only",
+    "tags": ["stack", "string"]
+  },
+  {
+    "id": "reverse-linked-list",
+    "title": "Reverse Linked List",
+    "description": "Given the head of a singly linked list, reverse the list and return the reversed list.",
+    "difficulty": "easy",
+    "topic": "linked_list",
+    "example_input": "head = [1, 2, 3, 4, 5]",
+    "example_output": "[5, 4, 3, 2, 1]",
+    "constraints": "0 <= nodes <= 5000, -5000 <= Node.val <= 5000",
+    "tags": ["linked-list", "recursion"]
+  },
+  {
+    "id": "max-subarray",
+    "title": "Maximum Subarray",
+    "description": "Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.",
+    "difficulty": "medium",
+    "topic": "dynamic_programming",
+    "example_input": "nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]",
+    "example_output": "6",
+    "constraints": "1 <= nums.length <= 10^5, -10^4 <= nums[i] <= 10^4",
+    "tags": ["dp", "divide-and-conquer", "kadane"]
+  },
+  {
+    "id": "binary-tree-inorder",
+    "title": "Binary Tree Inorder Traversal",
+    "description": "Given the root of a binary tree, return the inorder traversal of its nodes' values.",
+    "difficulty": "easy",
+    "topic": "trees",
+    "example_input": "root = [1, null, 2, 3]",
+    "example_output": "[1, 3, 2]",
+    "constraints": "0 <= nodes <= 100, -100 <= Node.val <= 100",
+    "tags": ["tree", "recursion", "stack"]
+  },
+  {
+    "id": "merge-k-sorted",
+    "title": "Merge k Sorted Lists",
+    "description": "You are given an array of k linked-lists lists, each linked-list is sorted in ascending order. Merge all the linked-lists into one sorted linked-list and return it.",
+    "difficulty": "hard",
+    "topic": "heap",
+    "example_input": "lists = [[1, 4, 5], [1, 3, 4], [2, 6]]",
+    "example_output": "[1, 1, 2, 3, 4, 4, 5, 6]",
+    "constraints": "k <= 10^4, total nodes <= 10^4",
+    "tags": ["heap", "divide-and-conquer", "linked-list"]
+  },
+  {
+    "id": "longest-substring",
+    "title": "Longest Substring Without Repeating Characters",
+    "description": "Given a string s, find the length of the longest substring without repeating characters.",
+    "difficulty": "medium",
+    "topic": "strings",
+    "example_input": "s = \"abcabcbb\"",
+    "example_output": "3",
+    "constraints": "0 <= s.length <= 5 * 10^4, s consists of English letters, digits, symbols and spaces",
+    "tags": ["sliding-window", "hash-map", "string"]
+  },
+  {
+    "id": "number-of-islands",
+    "title": "Number of Islands",
+    "description": "Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically.",
+    "difficulty": "medium",
+    "topic": "graphs",
+    "example_input": "grid = [[\"1\",\"1\",\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"0\",\"0\"]]",
+    "example_output": "1",
+    "constraints": "m, n <= 300",
+    "tags": ["bfs", "dfs", "union-find"]
+  },
+  {
+    "id": "binary-search",
+    "title": "Binary Search",
+    "description": "Given an array of integers nums which is sorted in ascending order and an integer target, write a function to search target in nums. If target exists, return its index. Otherwise, return -1.",
+    "difficulty": "easy",
+    "topic": "searching",
+    "example_input": "nums = [-1, 0, 3, 5, 9, 12], target = 9",
+    "example_output": "4",
+    "constraints": "1 <= nums.length <= 10^4, -10^4 <= nums[i] <= 10^4, nums is sorted",
+    "tags": ["binary-search", "array"]
+  },
+  {
+    "id": "coin-change",
+    "title": "Coin Change",
+    "description": "You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money. Return the fewest number of coins that you need to make up that amount. If that amount cannot be made up, return -1.",
+    "difficulty": "medium",
+    "topic": "dynamic_programming",
+    "example_input": "coins = [1, 2, 5], amount = 11",
+    "example_output": "3",
+    "constraints": "1 <= coins.length <= 12, 1 <= coins[i] <= 2^31 - 1, 0 <= amount <= 10^4",
+    "tags": ["dp", "bfs"]
+  }
+]
