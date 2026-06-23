@@ -16,7 +16,7 @@ from backend.services.rag_service import rag_service
 router = APIRouter(prefix="/questions", tags=["questions"])
 
 
-@router.get("/", response_model=list[QuestionResponse])
+@router.get("/")
 async def list_questions(
     topic: str | None = None,
     difficulty: str | None = None,
@@ -27,11 +27,10 @@ async def list_questions(
         query["topic"] = topic
     if difficulty:
         query["difficulty"] = difficulty
-    questions = await db_service.find_many("questions", query, limit)
-    return questions
+    return await db_service.find_many("questions", query, limit)
 
 
-@router.get("/{question_id}", response_model=QuestionResponse)
+@router.get("/{question_id}")
 async def get_question(question_id: str):
     question = await db_service.find_one("questions", {"_id": question_id})
     if not question:

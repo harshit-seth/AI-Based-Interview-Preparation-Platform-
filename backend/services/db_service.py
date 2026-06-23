@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import ConnectionFailure
 
@@ -51,6 +53,25 @@ class MongoDBService:
         col = await self.get_collection(collection)
         result = await col.delete_one(query)
         return result.deleted_count > 0
+
+    async def get_user_history(self, user_id: str) -> list[dict]:
+        col = await self.get_collection("sessions")
+        cursor = col.find({"user_id": user_id}).sort("timestamp", -1)
+        return await cursor.to_list(length=100)
+
+    async def save_session(
+        self, user_id: str, topic: str, question_id: str, score: int | None = None
+    ) -> str:
+        col = await self.get_collection("sessions")
+        doc = {
+            "user_id": user_id,
+            "topic": topic,
+            "question_id": question_id,
+            "score": score,
+            "timestamp": datetime.utcnow(),
+        }
+        result = await col.insert_one(doc)
+        return str(result.inserted_id)
 
 
 db_service = MongoDBService()

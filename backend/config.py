@@ -22,6 +22,9 @@ class Settings:
     MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", "2048"))
     TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.7"))
 
+    # Server
+    PORT: int = int(os.getenv("PORT", "8000"))
+
     # Embedding
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
