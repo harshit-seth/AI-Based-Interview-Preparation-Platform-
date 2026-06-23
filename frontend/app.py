@@ -82,6 +82,7 @@ defaults = {
     "mock_answers": {},
     "mock_start_time": None,
     "mock_submitted": False,
+    "questions_loaded": False,
 }
 for k, v in defaults.items():
     st.session_state.setdefault(k, v)
@@ -113,16 +114,17 @@ def api_post(path: str, payload: dict) -> dict | None:
         return None
 
 
-def fetch_questions():
-    topic = st.session_state.selected_topic
-    diff = st.session_state.selected_difficulty
+def fetch_questions(topic=None, difficulty=None):
+    t = topic or st.session_state.selected_topic
+    d = difficulty or st.session_state.selected_difficulty
+    url = f"/questions/?topic={t}&difficulty={d}"
     with st.spinner("Loading questions\u2026"):
-        data = api_get(f"/questions/?topic={topic}&difficulty={diff}")
-    if data:
-        st.session_state.questions = data
+        data = api_get(url)
+    if data is not None:
+        st.session_state.questions = data if isinstance(data, list) else []
+        st.session_state.questions_loaded = True
     else:
-        st.session_state.questions = []
-        st.warning("No questions found for this combination.")
+        st.warning("API returned no data.")
 
 
 def pick_question(q):
@@ -258,7 +260,9 @@ with st.sidebar:
     st.session_state.selected_difficulty = diff
 
     if st.button("\U0001f504 Refresh Questions", use_container_width=True):
-        fetch_questions(); st.rerun()
+        fetch_questions()
+        st.session_state.page = "Home"
+        st.rerun()
 
     st.markdown("---")
     s = st.session_state.stats
@@ -278,6 +282,14 @@ page = st.session_state.page
 # ====================== HOME ======================
 
 if page == "Home":
+    if not st.session_state.questions_loaded and not st.session_state.questions:
+        topic = st.session_state.selected_topic
+        with st.spinner("Loading questions\u2026"):
+            data = api_get(f"/questions/?topic={topic}")
+        if data is not None:
+            st.session_state.questions = data if isinstance(data, list) else []
+            st.session_state.questions_loaded = True
+
     col1, col2, col3 = st.columns(3)
     s = st.session_state.stats
     with col1:
@@ -324,10 +336,13 @@ if page == "Home":
         cols_q = st.columns(2)
         for idx, q in enumerate(st.session_state.questions[:6]):
             with cols_q[idx % 2]:
+                title = q.get("title", "Untitled")
+                diff = q.get("difficulty", "").upper()
+                top = q.get("topic", "").replace("_", " ").title()
                 st.markdown(
-                    f'<div class="card" style="cursor:pointer;">'
-                    f'<div class="card-title">{q.get("title", "")}</div>'
-                    f'<div class="card-value" style="font-size:0.85rem;color:#8b8fa3;">{q.get("difficulty", "").upper()} \u00b7 {q.get("topic", "").replace("_"," ").title()}</div>'
+                    f'<div class="card">'
+                    f'<div class="card-title">{title}</div>'
+                    f'<div class="card-value" style="font-size:0.85rem;color:#8b8fa3;">{diff} \u00b7 {top}</div>'
                     f"</div>",
                     unsafe_allow_html=True,
                 )
