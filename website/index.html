@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Interview Prep</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237c8cff'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">⚡</div>
+        <h2>Interview Prep</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-page="dashboard" onclick="navigate('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-btn" data-page="questions" onclick="navigate('questions')">
+          <span class="nav-icon">📝</span> Questions
+        </button>
+        <button class="nav-btn" data-page="history" onclick="navigate('history')">
+          <span class="nav-icon">📈</span> History
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="stat-mini">
+          <span class="stat-mini-label">Attempted</span>
+          <span class="stat-mini-value" id="stat-attempted">0</span>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-mini-label">Avg Score</span>
+          <span class="stat-mini-value" id="stat-avg">0</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p class="subtitle">Your interview preparation at a glance</p>
+        </div>
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card"><div class="stat-num" id="dash-attempted">0</div><div class="stat-label">Attempted</div></div>
+          <div class="stat-card"><div class="stat-num" id="dash-avg">0</div><div class="stat-label">Avg Score</div></div>
+          <div class="stat-card"><div class="stat-num" id="dash-best">0</div><div class="stat-label">Best Score</div></div>
+          <div class="stat-card"><div class="stat-num" id="dash-weakest">—</div><div class="stat-label">Weakest Topic</div></div>
+        </div>
+        <div class="card">
+          <h3>Score by Topic</h3>
+          <div class="chart-container" id="topic-chart"><p class="text-muted">Complete some questions to see your chart.</p></div>
+        </div>
+        <div class="card">
+          <h3>Quick Start</h3>
+          <div class="topic-grid">
+            <button class="topic-chip" onclick="quickStart('arrays')">Arrays</button>
+            <button class="topic-chip" onclick="quickStart('strings')">Strings</button>
+            <button class="topic-chip" onclick="quickStart('trees')">Trees</button>
+            <button class="topic-chip" onclick="quickStart('graphs')">Graphs</button>
+            <button class="topic-chip" onclick="quickStart('dynamic_programming')">DP</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== QUESTIONS ===== -->
+      <section class="page" id="page-questions">
+        <div class="page-header">
+          <h1>Questions</h1>
+          <p class="subtitle">Practice DSA problems with AI assistance</p>
+        </div>
+        <div class="filters">
+          <select id="filter-topic" onchange="loadQuestions()">
+            <option value="">All Topics</option>
+            <option value="arrays">Arrays</option>
+            <option value="strings">Strings</option>
+            <option value="trees">Trees</option>
+            <option value="graphs">Graphs</option>
+            <option value="dynamic_programming">Dynamic Programming</option>
+            <option value="linked_list">Linked List</option>
+            <option value="stacks_queues">Stacks & Queues</option>
+            <option value="heap">Heap</option>
+            <option value="searching">Searching</option>
+          </select>
+          <select id="filter-difficulty" onchange="loadQuestions()">
+            <option value="">All Difficulties</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+          <button class="btn btn-primary" onclick="loadQuestions()">🔄 Refresh</button>
+        </div>
+        <div id="questions-list" class="questions-grid"></div>
+        <div class="loading" id="questions-loading">Loading questions...</div>
+      </section>
+
+      <!-- ===== QUESTION DETAIL ===== -->
+      <section class="page" id="page-question">
+        <div class="page-header">
+          <button class="btn btn-ghost" onclick="navigate('questions')">← Back</button>
+          <h1 id="q-title"></h1>
+          <div class="badge-group" id="q-badges"></div>
+        </div>
+        <div class="card" id="q-description"></div>
+        <div class="card" id="q-example" style="display:none;"></div>
+        <div class="card" id="q-constraints" style="display:none;"></div>
+
+        <h3>Your Solution</h3>
+        <textarea id="code-editor" placeholder="Write your solution here..." spellcheck="false"></textarea>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="getHint()">💡 Hint</button>
+          <button class="btn btn-primary" onclick="submitFeedback()">✅ Submit</button>
+          <button class="btn btn-secondary" onclick="getSolution()">📖 Solution</button>
+        </div>
+
+        <div id="hint-output" class="card output-card hint-card" style="display:none;"></div>
+        <div id="solution-output" class="card output-card" style="display:none;"></div>
+        <div id="feedback-output" class="card output-card feedback-card" style="display:none;"></div>
+      </section>
+
+      <!-- ===== HISTORY ===== -->
+      <section class="page" id="page-history">
+        <div class="page-header">
+          <h1>History</h1>
+          <p class="subtitle">Your past practice sessions</p>
+        </div>
+        <div id="history-content">
+          <p class="text-muted">No history yet. Complete some questions to see your progress.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
