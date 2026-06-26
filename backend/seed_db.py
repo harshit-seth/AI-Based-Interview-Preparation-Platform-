@@ -1,9 +1,13 @@
 import json
+import os
 
+from dotenv import load_dotenv
 from pymongo import MongoClient, errors
 
-MONGO_URI = "mongodb://localhost:27017"
-DB_NAME = "interview_prep"
+load_dotenv()
+
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+DB_NAME = os.getenv("MONGO_DB_NAME", "interview_prep")
 COLLECTION_NAME = "questions"
 DATA_FILE = "data/question_bank.json"
 

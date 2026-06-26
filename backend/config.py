@@ -1,12 +1,28 @@
+import logging
 import os
+import sys
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
+def setup_logging():
+    fmt = "%(asctime)s | %(levelname)-7s | %(name)s:%(lineno)d | %(message)s"
+    level = logging.DEBUG if os.getenv("DEBUG", "").lower() == "true" else logging.INFO
+    logging.basicConfig(level=level, format=fmt, stream=sys.stdout)
+    return logging.getLogger(__name__)
+
+
+logger = setup_logging()
+
+
 class Settings:
     APP_NAME: str = "Interview Prep API"
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
+
+    # Server
+    PORT: int = int(os.getenv("PORT", "8000"))
 
     # MongoDB
     MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017")
@@ -22,11 +38,21 @@ class Settings:
     MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", "2048"))
     TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.7"))
 
-    # Server
-    PORT: int = int(os.getenv("PORT", "8000"))
-
     # Embedding
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
+    def validate(self):
+        missing = []
+        if not self.ANTHROPIC_API_KEY:
+            missing.append("ANTHROPIC_API_KEY")
+        if not self.MONGO_URI:
+            missing.append("MONGO_URI")
+        if missing:
+            logger.warning("Missing required env vars: %s", ", ".join(missing))
+            logger.warning("The app will start but some features may not work.")
+        else:
+            logger.info("All required environment variables are set.")
+        return self
 
-settings = Settings()
+
+settings = Settings().validate()

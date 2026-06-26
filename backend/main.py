@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,12 +8,18 @@ from backend.config import settings
 from backend.routes import feedback, history, questions
 from backend.services.db_service import db_service
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger.info("Starting up — connecting to MongoDB...")
     await db_service.connect()
+    logger.info("MongoDB connected successfully.")
     yield
+    logger.info("Shutting down — disconnecting MongoDB...")
     await db_service.disconnect()
+    logger.info("MongoDB disconnected.")
 
 
 app = FastAPI(
@@ -45,4 +52,5 @@ async def db_test():
         await db_service.client.admin.command("ping")
         return {"status": "connected", "database": settings.MONGO_DB_NAME}
     except Exception as e:
+        logger.exception("DB health check failed")
         return {"status": "error", "detail": str(e)}
