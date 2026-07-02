@@ -1,5 +1,5 @@
 /* ─── Configuration ────────────────────────────────────────── */
-const API = "http://localhost:8000";
+const API = (typeof __API_BASE__ !== "undefined") ? __API_BASE__ : "http://localhost:8000";
 
 // ─── State ───────────────────────────────────────────────────
 const state = {
