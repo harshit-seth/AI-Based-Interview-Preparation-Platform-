@@ -75,6 +75,7 @@ defaults = {
     "hint": None,
     "solution": None,
     "history": [],
+    "user_id": "guest",
     "selected_topic": "arrays",
     "selected_difficulty": "medium",
     "stats": {"attempted": 0, "avg_score": 0, "total_scores": []},
@@ -83,6 +84,7 @@ defaults = {
     "mock_start_time": None,
     "mock_submitted": False,
     "questions_loaded": False,
+    "history_loaded": False,
 }
 for k, v in defaults.items():
     st.session_state.setdefault(k, v)
@@ -164,6 +166,32 @@ def render_question_card(q: dict):
         st.markdown(ex_html, unsafe_allow_html=True)
 
 
+def save_session(question_id, topic, score):
+    uid = st.session_state.user_id
+    api_post(
+        f"/history/{uid}?topic={topic}&question_id={question_id}&score={score}",
+        {},
+    )
+
+def load_history():
+    uid = st.session_state.user_id
+    data = api_get(f"/history/{uid}")
+    if data and isinstance(data, list) and len(data):
+        st.session_state.history = [
+            {
+                "question": s.get("question_id", ""),
+                "score": s.get("score", 0),
+                "topic": s.get("topic", "unknown"),
+                "timestamp": s.get("timestamp", ""),
+            }
+            for s in data
+        ]
+        scores = [h["score"] for h in st.session_state.history]
+        st.session_state.stats["attempted"] = len(scores)
+        st.session_state.stats["total_scores"] = scores
+        st.session_state.stats["avg_score"] = round(sum(scores) / len(scores), 1) if scores else 0
+    st.session_state.history_loaded = True
+
 def handle_feedback(q_id: str):
     code = st.session_state.user_code.strip()
     if not code:
@@ -190,16 +218,17 @@ def handle_feedback(q_id: str):
                 / len(st.session_state.stats["total_scores"]),
                 1,
             )
+        topic = (st.session_state.current_question.get("topic", "unknown")
+                 if st.session_state.current_question else "unknown")
         st.session_state.history.append(
             {
                 "question": q_id,
                 "score": score,
-                "topic": st.session_state.current_question.get(
-                    "topic", "unknown"
-                ) if st.session_state.current_question else "unknown",
+                "topic": topic,
                 "timestamp": time.strftime("%Y-%m-%d %H:%M"),
             }
         )
+        save_session(q_id, topic, score)
         st.success("Feedback received!")
 
 
@@ -282,6 +311,8 @@ page = st.session_state.page
 # ====================== HOME ======================
 
 if page == "Home":
+    if not st.session_state.history_loaded:
+        load_history()
     if not st.session_state.questions_loaded and not st.session_state.questions:
         topic = st.session_state.selected_topic
         with st.spinner("Loading questions\u2026"):
@@ -558,20 +589,33 @@ elif page == "Mock Interview":
         )
 
         if st.session_state.mock_submitted:
-            # Show results
             st.markdown("### \U0001f3c6 Results")
-            total = 0
-            results = []
+            # Evaluate with AI
+            items = []
             for i, q in enumerate(mq):
                 ans = st.session_state.mock_answers.get(i, "")
-                score = min(10, len(ans.split()) // 2) if ans.strip() else 0
-                total += score
-                color = "#2ecc71" if score >= 7 else "#e67e22" if score >= 4 else "#e74c3c"
+                items.append({
+                    "question_id": qid(q),
+                    "title": q.get("title", ""),
+                    "description": q.get("description", ""),
+                    "answer": ans,
+                })
+            with st.spinner("Evaluating your answers with AI..."):
+                eval_data = api_post("/feedback/batch-eval", {"language": "python", "items": items})
+            total = 0
+            ai_results = eval_data.get("results", []) if eval_data else []
+            for i, q in enumerate(mq):
+                ai_score = ai_results[i]["score"] // 10 if i < len(ai_results) else 0
+                fb = ai_results[i].get("feedback", "") if i < len(ai_results) else ""
+                total += ai_score
+                color = "#2ecc71" if ai_score >= 7 else "#e67e22" if ai_score >= 4 else "#e74c3c"
                 st.markdown(
                     f'<div class="card" style="border-left: 4px solid {color};">'
                     f'<div class="card-title">Q{i+1}: {q.get("title", "")} '
-                    f'<span style="float:right;color:{color};">{score}/10</span></div>'
+                    f'<span style="float:right;color:{color};">{ai_score}/10</span></div>'
                     f'<div class="card-value" style="font-size:0.85rem;">{q.get("description", "")[:120]}...</div>'
+                    f'<details><summary style="color:#8b8fa3;cursor:pointer;">Feedback</summary>'
+                    f'<p style="font-size:0.85rem;margin-top:0.5rem;">{fb}</p></details>'
                     f"</div>",
                     unsafe_allow_html=True,
                 )

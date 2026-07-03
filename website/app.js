@@ -7,6 +7,7 @@ const state = {
   history: [],
   scores: [],
   stats: { attempted: 0, avgScore: 0, best: 0 },
+  userId: localStorage.getItem("userId") || "guest",
 };
 
 // ─── DOM Helpers ─────────────────────────────────────────────
@@ -195,14 +196,41 @@ async function getHint() {
   }
 }
 
+function selectedLang() {
+  const el = document.getElementById("lang-select");
+  return el ? el.value : "python";
+}
+
 async function getSolution() {
   const q = state.currentQuestion;
   if (!q) return;
-  const data = await apiPost(`/questions/${qid(q)}/solution`, { question_id: qid(q), language: "python" });
+  const lang = selectedLang();
+  const data = await apiPost(`/questions/${qid(q)}/solution`, { question_id: qid(q), language: lang });
   if (data) {
     const el = document.getElementById("solution-output");
     el.className = "card output-card solution-card visible";
     el.innerHTML = `<h3>📖 Model Solution</h3><pre>${data.solution_code || "No solution returned."}</pre>`;
+  }
+}
+
+async function saveSession(questionId, topic, score) {
+  await apiPost(
+    `/history/${state.userId}?topic=${encodeURIComponent(topic)}&question_id=${encodeURIComponent(questionId)}&score=${score}`,
+    {}
+  );
+}
+
+async function loadHistory() {
+  const data = await apiGet(`/history/${state.userId}`);
+  if (data && data.length) {
+    state.history = data.map((s) => ({
+      question: s.question_id || "",
+      score: s.score || 0,
+      topic: s.topic || "unknown",
+      timestamp: s.timestamp ? new Date(s.timestamp).toLocaleString() : "",
+    }));
+    state.scores = state.history.map((h) => h.score);
+    renderDashboard();
   }
 }
 
@@ -211,9 +239,9 @@ async function submitFeedback() {
   if (!q) return;
   const code = document.getElementById("code-editor").value.trim();
   if (!code) { toast("Please write some code before submitting.", "error"); return; }
-  const data = await apiPost("/feedback/", { question_id: qid(q), user_code: code, language: "python" });
+  const lang = selectedLang();
+  const data = await apiPost("/feedback/", { question_id: qid(q), user_code: code, language: lang });
   if (data) {
-    // Parse rating
     let score = 0;
     const fb = data.feedback || "";
     fb.split("\n").forEach((line) => {
@@ -225,6 +253,7 @@ async function submitFeedback() {
     state.history.push({ question: qid(q), score, topic: q.topic || "unknown", timestamp: new Date().toLocaleString() });
     state.scores.push(score);
     renderDashboard();
+    await saveSession(qid(q), q.topic || "unknown", score);
     const el = document.getElementById("feedback-output");
     el.className = "card output-card feedback-card visible";
     el.innerHTML = `<h3>✅ Feedback</h3><p>${fb.replace(/\n/g, "<br>")}</p>`;
@@ -250,7 +279,8 @@ function renderHistory() {
 }
 
 // ─── Init ────────────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadHistory();
   renderDashboard();
   navigate("dashboard");
 });

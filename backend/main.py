@@ -5,15 +5,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import settings
-from backend.routes import feedback, history, questions
+from backend.routes import auth, feedback, history, questions
 from backend.services.db_service import db_service
-from backend.services.rag_service import get_rag_service
 
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI):  # noqa: ARG001
     logger.info("Starting up...")
     yield
     if db_service.client:
@@ -36,6 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(questions.router)
 app.include_router(feedback.router)
 app.include_router(history.router)

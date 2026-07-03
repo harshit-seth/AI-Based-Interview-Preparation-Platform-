@@ -1,17 +1,16 @@
 from datetime import datetime
-from enum import Enum
-from typing import Optional
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class Difficulty(str, Enum):
+class Difficulty(StrEnum):
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
 
 
-class Topic(str, Enum):
+class Topic(StrEnum):
     ARRAYS = "arrays"
     STRINGS = "strings"
     LINKED_LIST = "linked_list"
@@ -32,11 +31,11 @@ class Question(BaseModel):
     description: str
     difficulty: Difficulty
     topic: Topic
-    example_input: Optional[str] = None
-    example_output: Optional[str] = None
-    constraints: Optional[str] = None
-    solution_approach: Optional[str] = None
-    code_snippet: Optional[str] = None
+    example_input: str | None = None
+    example_output: str | None = None
+    constraints: str | None = None
+    solution_approach: str | None = None
+    code_snippet: str | None = None
     tags: list[str] = []
 
     class Config:
@@ -48,11 +47,11 @@ class QuestionCreate(BaseModel):
     description: str
     difficulty: Difficulty
     topic: Topic
-    example_input: Optional[str] = None
-    example_output: Optional[str] = None
-    constraints: Optional[str] = None
-    solution_approach: Optional[str] = None
-    code_snippet: Optional[str] = None
+    example_input: str | None = None
+    example_output: str | None = None
+    constraints: str | None = None
+    solution_approach: str | None = None
+    code_snippet: str | None = None
     tags: list[str] = []
 
 
@@ -62,9 +61,9 @@ class QuestionResponse(BaseModel):
     description: str
     difficulty: Difficulty
     topic: Topic
-    example_input: Optional[str] = None
-    example_output: Optional[str] = None
-    constraints: Optional[str] = None
+    example_input: str | None = None
+    example_output: str | None = None
+    constraints: str | None = None
     tags: list[str] = []
 
 
@@ -78,13 +77,13 @@ class FeedbackResponse(BaseModel):
     question_id: str
     feedback: str
     suggestions: list[str] = []
-    rating: Optional[int] = None
+    rating: int | None = None
     generated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 class HintRequest(BaseModel):
     question_id: str
-    user_code: Optional[str] = None
+    user_code: str | None = None
 
 
 class HintResponse(BaseModel):
@@ -105,3 +104,25 @@ class SolutionResponse(BaseModel):
     time_complexity: str
     space_complexity: str
     generated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class GenerateQuestionRequest(BaseModel):
+    topic: Topic
+    difficulty: Difficulty
+    count: int = 3
+    additional_instructions: str = ""
+
+
+class GeneratedQuestion(BaseModel):
+    title: str
+    description: str
+    difficulty: Difficulty
+    topic: Topic
+    example_input: str | None = None
+    example_output: str | None = None
+    constraints: str | None = None
+    solution_approach: str | None = None
+
+
+class GenerateQuestionResponse(BaseModel):
+    questions: list[GeneratedQuestion]

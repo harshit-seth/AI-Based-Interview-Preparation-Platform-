@@ -38,6 +38,9 @@ class Settings:
     MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", "2048"))
     TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.7"))
 
+    # Auth
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "change-this-secret-in-production")
+
     # Embedding
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 

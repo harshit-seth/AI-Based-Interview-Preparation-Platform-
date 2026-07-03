@@ -1,9 +1,12 @@
 from fastapi import APIRouter, HTTPException
 
+from backend.code_templates import get_boilerplate, get_language_prompt
 from backend.models.schemas import (
+    GeneratedQuestion,
+    GenerateQuestionRequest,
+    GenerateQuestionResponse,
     HintRequest,
     HintResponse,
-    Question,
     QuestionCreate,
     QuestionResponse,
     SolutionRequest,
@@ -59,8 +62,14 @@ async def get_hint(question_id: str, payload: HintRequest):
     context = get_rag_service().query(query_text=question["title"], n_results=3)
     context_text = "\n".join([c["document"] for c in context])
 
-    system_prompt = "You are a helpful DSA interview tutor. Provide a subtle hint without giving away the full solution."
-    user_prompt = f"Question: {question['title']}\n{question['description']}\n\nUser's current code:\n{payload.user_code or 'No code yet'}"
+    system_prompt = (
+        "You are a helpful DSA interview tutor. "
+        "Provide a subtle hint without giving away the full solution."
+    )
+    user_prompt = (
+        f"Question: {question['title']}\n{question['description']}\n\n"
+        f"User's current code:\n{payload.user_code or 'No code yet'}"
+    )
     hint = await llm_service.generate_with_context(
         system_prompt=system_prompt,
         user_prompt=user_prompt,
@@ -80,8 +89,19 @@ async def get_solution(question_id: str, payload: SolutionRequest):
     context = get_rag_service().query(query_text=question["title"], n_results=3)
     context_text = "\n".join([c["document"] for c in context])
 
-    system_prompt = "You are a DSA expert. Provide a well-documented solution with complexity analysis."
-    user_prompt = f"Question: {question['title']}\n{question['description']}\nLanguage: {payload.language}"
+    lang_prompt = get_language_prompt(payload.language)
+    boilerplate = get_boilerplate(payload.language)
+    system_prompt = (
+        "You are a DSA expert. "
+        "Provide a well-documented solution with complexity analysis. "
+        f"{lang_prompt}"
+    )
+    user_prompt = (
+        f"Question: {question['title']}\n{question['description']}\n"
+        f"Language: {payload.language}\n\n"
+        f"Provide the complete {payload.language} solution. "
+        f"Here is a starting template:\n{boilerplate}"
+    )
     solution = await llm_service.generate_with_context(
         system_prompt=system_prompt,
         user_prompt=user_prompt,
@@ -96,3 +116,58 @@ async def get_solution(question_id: str, payload: SolutionRequest):
         time_complexity="",
         space_complexity="",
     )
+
+
+@router.post("/generate", response_model=GenerateQuestionResponse)
+async def generate_questions(payload: GenerateQuestionRequest):
+    import json
+
+    system_prompt = (
+        "You are an expert DSA question creator. "
+        "Generate high-quality interview questions with detailed specifications. "
+        "Respond ONLY with a valid JSON array of objects, no markdown or explanation."
+    )
+    user_prompt = (
+        f"Generate {payload.count} DSA interview questions about {payload.topic.value}. "
+        f"Difficulty: {payload.difficulty.value}. "
+        f"{payload.additional_instructions}\n\n"
+        f"Each question must have these fields:\n"
+        f"- title (short title)\n"
+        f"- description (detailed description with examples)\n"
+        f"- difficulty ({payload.difficulty.value})\n"
+        f"- topic ({payload.topic.value})\n"
+        f"- example_input (optional)\n"
+        f"- example_output (optional)\n"
+        f"- constraints (optional)\n"
+        f"- solution_approach (brief approach hint)\n\n"
+        f"Return as JSON array."
+    )
+    response_text = await llm_service.generate(
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        max_tokens=2000,
+        temperature=0.8,
+    )
+    try:
+        raw = response_text.strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        data = json.loads(raw)
+    except (json.JSONDecodeError, ValueError):
+        return GenerateQuestionResponse(questions=[])
+
+    questions = []
+    for item in data[: payload.count]:
+        questions.append(
+            GeneratedQuestion(
+                title=item.get("title", "Untitled"),
+                description=item.get("description", ""),
+                difficulty=payload.difficulty,
+                topic=payload.topic,
+                example_input=item.get("example_input"),
+                example_output=item.get("example_output"),
+                constraints=item.get("constraints"),
+                solution_approach=item.get("solution_approach"),
+            )
+        )
+    return GenerateQuestionResponse(questions=questions)

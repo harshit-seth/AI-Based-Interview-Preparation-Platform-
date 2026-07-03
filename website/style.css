@@ -129,6 +129,15 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg-primar
 }
 .topic-chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,140,255,.08); }
 
+/* ─── Language Selector ───────────────────────────────────── */
+.lang-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.75rem 0; }
+.lang-row label { font-size: 0.85rem; color: var(--text-secondary); }
+.lang-row select {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); padding: 0.4rem 0.75rem; font-size: 0.85rem; cursor: pointer;
+}
+.lang-row select:focus { outline: none; border-color: var(--accent); }
+
 /* ─── Code Editor ──────────────────────────────────────────── */
 #code-editor {
   width: 100%; min-height: 250px; background: #0a0d14; border: 1px solid var(--border);
