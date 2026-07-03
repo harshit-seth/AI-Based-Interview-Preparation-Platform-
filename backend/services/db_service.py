@@ -37,10 +37,10 @@ class MongoDBService:
 
     async def _ensure(self):
         if self.client is None:
-            await self.connect()
-            # connect() already handles exceptions internally
-            if self.client is None:
-                return
+            try:
+                await self.connect()
+            except Exception:
+                pass
 
     async def get_collection(self, name: str):
         await self._ensure()
