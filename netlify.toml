@@ -1,0 +1,16 @@
+[build]
+  publish = "website"
+  command = "echo 'Static site - no build required'"
+
+[build.environment]
+  API_BASE = "http://localhost:8000"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://localhost:8000/:splat"
+  status = 200

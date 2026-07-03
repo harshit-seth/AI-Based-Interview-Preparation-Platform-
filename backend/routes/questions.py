@@ -11,7 +11,7 @@ from backend.models.schemas import (
 )
 from backend.services.db_service import db_service
 from backend.services.llm_service import llm_service
-from backend.services.rag_service import rag_service
+from backend.services.rag_service import get_rag_service
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 
@@ -42,7 +42,7 @@ async def get_question(question_id: str):
 async def create_question(payload: QuestionCreate):
     doc = payload.model_dump()
     question_id = await db_service.insert_one("questions", doc)
-    rag_service.add_documents(
+    get_rag_service().add_documents(
         ids=[question_id],
         texts=[f"{payload.title}: {payload.description}"],
         metadatas=[{"difficulty": payload.difficulty, "topic": payload.topic}],
@@ -56,7 +56,7 @@ async def get_hint(question_id: str, payload: HintRequest):
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
 
-    context = rag_service.query(query_text=question["title"], n_results=3)
+    context = get_rag_service().query(query_text=question["title"], n_results=3)
     context_text = "\n".join([c["document"] for c in context])
 
     system_prompt = "You are a helpful DSA interview tutor. Provide a subtle hint without giving away the full solution."
@@ -77,7 +77,7 @@ async def get_solution(question_id: str, payload: SolutionRequest):
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
 
-    context = rag_service.query(query_text=question["title"], n_results=3)
+    context = get_rag_service().query(query_text=question["title"], n_results=3)
     context_text = "\n".join([c["document"] for c in context])
 
     system_prompt = "You are a DSA expert. Provide a well-documented solution with complexity analysis."

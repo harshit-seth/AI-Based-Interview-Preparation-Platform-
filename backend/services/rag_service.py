@@ -1,12 +1,13 @@
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from sentence_transformers import SentenceTransformer
 
 from backend.config import settings
 
 
 class RAGService:
     def __init__(self):
+        from sentence_transformers import SentenceTransformer
+
         self.client = chromadb.PersistentClient(
             path=settings.CHROMA_PERSIST_DIR,
             settings=ChromaSettings(anonymized_telemetry=False),
@@ -64,4 +65,11 @@ class RAGService:
         return self.collection.count()
 
 
-rag_service = RAGService()
+_rag_service: RAGService | None = None
+
+
+def get_rag_service() -> RAGService:
+    global _rag_service
+    if _rag_service is None:
+        _rag_service = RAGService()
+    return _rag_service
