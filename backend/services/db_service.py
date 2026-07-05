@@ -36,11 +36,11 @@ class MongoDBService:
             self.db = None
 
     async def _ensure(self):
-        if self.client is None:
+        if self.client is None and not getattr(self, "_failed", False):
             try:
                 await self.connect()
             except Exception:
-                pass
+                self._failed = True
 
     async def get_collection(self, name: str):
         await self._ensure()
