@@ -120,7 +120,7 @@ class GeneratedQuestion(BaseModel):
     topic: Topic
     example_input: str | None = None
     example_output: str | None = None
-    constraints: str | None = None
+    constraints: str | list[str] | None = None
     solution_approach: str | None = None
 
 

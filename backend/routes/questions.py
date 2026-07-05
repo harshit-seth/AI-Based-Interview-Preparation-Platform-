@@ -158,6 +158,9 @@ async def generate_questions(payload: GenerateQuestionRequest):
 
     questions = []
     for item in data[: payload.count]:
+        constraints = item.get("constraints")
+        if isinstance(constraints, list):
+            constraints = "\n".join(constraints)
         questions.append(
             GeneratedQuestion(
                 title=item.get("title", "Untitled"),
@@ -166,7 +169,7 @@ async def generate_questions(payload: GenerateQuestionRequest):
                 topic=payload.topic,
                 example_input=item.get("example_input"),
                 example_output=item.get("example_output"),
-                constraints=item.get("constraints"),
+                constraints=constraints,
                 solution_approach=item.get("solution_approach"),
             )
         )

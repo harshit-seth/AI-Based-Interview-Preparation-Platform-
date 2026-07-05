@@ -32,9 +32,12 @@ class Settings:
     CHROMA_PERSIST_DIR: str = os.getenv("CHROMA_PERSIST_DIR", "data/chroma_db")
     CHROMA_COLLECTION_NAME: str = os.getenv("CHROMA_COLLECTION_NAME", "questions")
 
-    # Anthropic
+    # LLM Provider
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "gemini")
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
     CLAUDE_MODEL: str = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "AIzaSyD4q2gQsHMltBz2UnNq2H_I2wIyiMIXiGM")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", "2048"))
     TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.7"))
 
@@ -46,8 +49,8 @@ class Settings:
 
     def validate(self):
         missing = []
-        if not self.ANTHROPIC_API_KEY:
-            missing.append("ANTHROPIC_API_KEY")
+        if not self.GEMINI_API_KEY and not self.ANTHROPIC_API_KEY:
+            missing.append("GEMINI_API_KEY or ANTHROPIC_API_KEY")
         if not self.MONGO_URI:
             missing.append("MONGO_URI")
         if missing:
