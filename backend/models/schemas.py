@@ -38,8 +38,7 @@ class Question(BaseModel):
     code_snippet: str | None = None
     tags: list[str] = []
 
-    class Config:
-        populate_by_name = True
+    model_config = {"populate_by_name": True}
 
 
 class QuestionCreate(BaseModel):

@@ -64,6 +64,9 @@ async def signup(payload: SignupRequest):
         "created_at": __import__("datetime").datetime.utcnow().isoformat(),
     }
     user_id = await db_service.insert_one("users", user_doc)
+    if user_id is None:
+        import uuid
+        user_id = str(uuid.uuid4())
     token = create_access_token({"sub": user_id, "email": payload.email})
     return AuthResponse(
         token=token,
