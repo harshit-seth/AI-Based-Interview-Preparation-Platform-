@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Time Complexity Chart — Hinglish</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E1117;
+    --panel:#161B24;
+    --panel-2:#1B212C;
+    --line:#262E3B;
+    --text:#E7EAF0;
+    --muted:#8B93A3;
+    --muted-2:#5C6474;
+
+    --c1:#22C55E;  /* O(1) */
+    --c2:#4ADE80;  /* O(log n) */
+    --c3:#A3E635;  /* O(sqrt n) */
+    --c4:#FACC15;  /* O(n) */
+    --c5:#FB923C;  /* O(n log n) */
+    --c6:#F97316;  /* O(n^2) */
+    --c7:#EF4444;  /* O(n^3) */
+    --c8:#DC2626;  /* O(2^n) */
+    --c9:#991B1B;  /* O(n!) */
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 15% -10%, rgba(34,197,94,0.08), transparent 60%),
+      radial-gradient(1000px 500px at 100% 10%, rgba(239,68,68,0.07), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    padding:48px 20px 80px;
+  }
+
+  .wrap{max-width:920px;margin:0 auto;}
+
+  /* ---------- HERO ---------- */
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:linear-gradient(135deg,var(--c1),var(--c9));
+    box-shadow:0 0 12px rgba(34,197,94,.5);
+  }
+
+  h1{
+    font-family:'Sora',sans-serif;
+    font-weight:800;
+    font-size:clamp(30px,5vw,44px);
+    line-height:1.12;
+    margin:0 0 12px;
+    letter-spacing:-0.01em;
+  }
+  h1 span{
+    background:linear-gradient(90deg,var(--c1),var(--c4) 45%,var(--c8));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .subtitle{
+    color:var(--muted);
+    font-size:15.5px;
+    max-width:560px;
+    line-height:1.6;
+    margin-bottom:36px;
+  }
+
+  .hero-panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px 24px 18px;
+    margin-bottom:56px;
+  }
+  .hero-panel-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted-2);
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    margin-bottom:14px;
+  }
+  svg{display:block;width:100%;height:auto;}
+  .curve{fill:none;stroke-width:2.5;stroke-linecap:round;}
+  .curve-label{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;}
+  .axis-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--muted-2);}
+
+  /* ---------- SECTION HEADS ---------- */
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin:0 0 20px;
+  }
+  .section-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--muted-2);
+  }
+  .section-title{
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:20px;
+    margin:0;
+  }
+
+  /* ---------- TABLE ---------- */
+  .table{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    margin-bottom:56px;
+  }
+  .row{
+    display:grid;
+    grid-template-columns:14px 130px 150px 1fr;
+    gap:18px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--line);
+    align-items:center;
+    transition:background .15s ease;
+  }
+  .row:last-child{border-bottom:none;}
+  .row:hover{background:var(--panel-2);}
+  .row.head{
+    background:var(--panel-2);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted-2);
+    padding:12px 20px;
+  }
+  .bar{width:6px;height:28px;border-radius:4px;}
+  .big-o{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:16px;
+  }
+  .name-cell .name{font-weight:600;font-size:14.5px;}
+  .name-cell .speed{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .desc-cell .exp{
+    font-size:13.5px;
+    color:var(--text);
+    line-height:1.5;
+    margin-bottom:4px;
+  }
+  .desc-cell .ex{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--muted);
+  }
+
+  @media (max-width:640px){
+    .row{grid-template-columns:6px 1fr;grid-template-rows:auto auto;row-gap:6px;}
+    .bar{width:4px;height:100%;grid-row:1/3;}
+    .big-o-cell{grid-column:2;}
+    .name-cell{grid-column:2;}
+    .desc-cell{grid-column:2;}
+    .row.head{display:none;}
+  }
+
+  /* ---------- FLOW ---------- */
+  .flow{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px 24px;
+    margin-bottom:56px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+  }
+  .flow-chip{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+  }
+  .flow-arrow{color:var(--muted-2);font-size:14px;}
+
+  /* ---------- TIPS ---------- */
+  .tips{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:56px;
+  }
+  @media (max-width:640px){.tips{grid-template-columns:1fr;}}
+  .tip-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px 22px;
+  }
+  .tip-card h3{
+    font-family:'Sora',sans-serif;
+    font-size:14.5px;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .tip-card ul{margin:0;padding-left:18px;}
+  .tip-card li{
+    font-size:13.5px;
+    color:var(--text);
+    line-height:1.9;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .dot-good{color:var(--c1);}
+  .dot-ok{color:var(--c4);}
+  .dot-bad{color:var(--c8);}
+
+  /* ---------- CONSTRAINT TABLE ---------- */
+  .ctable{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    margin-bottom:40px;
+  }
+  .crow{
+    display:grid;
+    grid-template-columns:160px 1fr;
+    padding:15px 22px;
+    border-bottom:1px solid var(--line);
+    font-size:13.5px;
+  }
+  .crow:last-child{border-bottom:none;}
+  .crow.head{
+    background:var(--panel-2);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted-2);
+  }
+  .crow .n{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--c4);}
+  .crow .c{font-family:'JetBrains Mono',monospace;color:var(--muted);}
+
+  footer{
+    text-align:center;
+    color:var(--muted-2);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">DSA · Interview Prep</div>
+  <h1>Time Complexity <span>Best → Worst</span></h1>
+  <p class="subtitle">Ek reference jo coding interview aur DSA problems solve karte waqt kaam aaye — Big-O se lekar constraint ke hisaab se sahi complexity chunne tak.</p>
+
+  <div class="hero-panel">
+    <div class="hero-panel-title">Growth curves — kaise scale karte hain n badhne par</div>
+    <svg viewBox="0 0 860 340">
+      <!-- gridlines -->
+      <line x1="60" y1="20" x2="60" y2="290" stroke="#262E3B" stroke-width="1"/>
+      <line x1="60" y1="290" x2="820" y2="290" stroke="#262E3B" stroke-width="1"/>
+      <text x="30" y="24" class="axis-label">slow</text>
+      <text x="30" y="294" class="axis-label">fast</text>
+      <text x="770" y="308" class="axis-label">n →</text>
+
+      <!-- curves (illustrative, not to exact scale) -->
+      <path class="curve" stroke="var(--c9)" d="M60,290 C 160,150 260,20 340,20 L 820,20"/>
+      <path class="curve" stroke="var(--c8)" d="M60,290 C 220,270 300,120 400,40 C 500,10 650,10 820,10"/>
+      <path class="curve" stroke="var(--c7)" d="M60,290 C 300,285 500,220 650,90 C 720,50 780,25 820,15"/>
+      <path class="curve" stroke="var(--c6)" d="M60,290 Q 450,270 650,150 T 820,60"/>
+      <path class="curve" stroke="var(--c5)" d="M60,288 Q 500,255 700,190 T 820,150"/>
+      <path class="curve" stroke="var(--c4)" d="M60,288 L 820,190"/>
+      <path class="curve" stroke="var(--c3)" d="M60,286 Q 400,260 820,235"/>
+      <path class="curve" stroke="var(--c2)" d="M60,282 Q 400,270 820,258"/>
+      <path class="curve" stroke="var(--c1)" d="M60,278 L 820,278"/>
+
+      <!-- labels -->
+      <text x="700" y="12" class="curve-label" fill="var(--c9)">n!</text>
+      <text x="700" y="30" class="curve-label" fill="var(--c8)">2ⁿ</text>
+      <text x="700" y="82" class="curve-label" fill="var(--c7)">n³</text>
+      <text x="700" y="145" class="curve-label" fill="var(--c6)">n²</text>
+      <text x="700" y="182" class="curve-label" fill="var(--c5)">n log n</text>
+      <text x="700" y="205" class="curve-label" fill="var(--c4)">n</text>
+      <text x="700" y="232" class="curve-label" fill="var(--c3)">√n</text>
+      <text x="700" y="255" class="curve-label" fill="var(--c2)">log n</text>
+      <text x="700" y="274" class="curve-label" fill="var(--c1)">1</text>
+    </svg>
+  </div>
+
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Complexity Chart</h2>
+  </div>
+
+  <div class="table">
+    <div class="row head">
+      <span></span>
+      <span>Big-O</span>
+      <span>Name / Speed</span>
+      <span>Explanation + Example</span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c1)"></span>
+      <span class="big-o" style="color:var(--c1)">O(1)</span>
+      <span class="name-cell"><div class="name">Constant</div><div class="speed">⭐⭐⭐⭐⭐ fastest</div></span>
+      <span class="desc-cell"><div class="exp">Input kitna bhi bada ho, time same rehta hai.</div><div class="ex">Array indexing · Stack push/pop · HashMap access (avg.)</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c2)"></span>
+      <span class="big-o" style="color:var(--c2)">O(log n)</span>
+      <span class="name-cell"><div class="name">Logarithmic</div><div class="speed">⭐⭐⭐⭐</div></span>
+      <span class="desc-cell"><div class="exp">Har step me search space aadha ho jata hai.</div><div class="ex">Binary Search</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c3)"></span>
+      <span class="big-o" style="color:var(--c3)">O(√n)</span>
+      <span class="name-cell"><div class="name">Square Root</div><div class="speed">⭐⭐⭐</div></span>
+      <span class="desc-cell"><div class="exp">Mostly number theory problems me use hota hai.</div><div class="ex">Finding factors · Prime checking</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c4)"></span>
+      <span class="big-o" style="color:var(--c4)">O(n)</span>
+      <span class="name-cell"><div class="name">Linear</div><div class="speed">⭐⭐⭐</div></span>
+      <span class="desc-cell"><div class="exp">Har element ko ek baar visit karna padta hai.</div><div class="ex">Linear Search · Array Traversal</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c5)"></span>
+      <span class="big-o" style="color:var(--c5)">O(n log n)</span>
+      <span class="name-cell"><div class="name">Linearithmic</div><div class="speed">⭐⭐</div></span>
+      <span class="desc-cell"><div class="exp">Divide & Conquer algorithms ka common complexity.</div><div class="ex">Merge Sort · Heap Sort · Quick Sort (avg.)</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c6)"></span>
+      <span class="big-o" style="color:var(--c6)">O(n²)</span>
+      <span class="name-cell"><div class="name">Quadratic</div><div class="speed">⭐⭐</div></span>
+      <span class="desc-cell"><div class="exp">Har element ke saath har element compare hota hai.</div><div class="ex">Bubble Sort · Selection Sort · Nested Loops</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c7)"></span>
+      <span class="big-o" style="color:var(--c7)">O(n³)</span>
+      <span class="name-cell"><div class="name">Cubic</div><div class="speed">⭐</div></span>
+      <span class="desc-cell"><div class="exp">Triple nested loops.</div><div class="ex">Floyd-Warshall · Matrix Multiplication (naive)</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c8)"></span>
+      <span class="big-o" style="color:var(--c8)">O(2ⁿ)</span>
+      <span class="name-cell"><div class="name">Exponential</div><div class="speed">🚨 very slow</div></span>
+      <span class="desc-cell"><div class="exp">Har step me possibilities double ho jati hain.</div><div class="ex">Recursive Fibonacci · Backtracking</div></span>
+    </div>
+
+    <div class="row">
+      <span class="bar" style="background:var(--c9)"></span>
+      <span class="big-o" style="color:var(--c9)">O(n!)</span>
+      <span class="name-cell"><div class="name">Factorial</div><div class="speed">💀 slowest</div></span>
+      <span class="desc-cell"><div class="exp">Har permutation try karni padti hai.</div><div class="ex">Traveling Salesman (Brute Force) · Permutations</div></span>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Easy Order (Best → Worst)</h2>
+  </div>
+
+  <div class="flow">
+    <span class="flow-chip" style="color:var(--c1)">O(1)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c2)">O(log n)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c3)">O(√n)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c4)">O(n)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c5)">O(n log n)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c6)">O(n²)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c7)">O(n³)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c8)">O(2ⁿ)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-chip" style="color:var(--c9)">O(n!)</span>
+  </div>
+
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Interview Tip</h2>
+  </div>
+
+  <div class="tips">
+    <div class="tip-card">
+      <h3><span class="dot-good">●</span> Chase these</h3>
+      <ul>
+        <li>Excellent: O(1), O(log n)</li>
+        <li>Good: O(n), O(n log n)</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <h3><span class="dot-bad">●</span> Watch out</h3>
+      <ul>
+        <li>Acceptable (small n): O(n²)</li>
+        <li>Avoid if n large: O(n³), O(2ⁿ), O(n!)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Constraint vs Suitable Complexity</h2>
+  </div>
+
+  <div class="ctable">
+    <div class="crow head"><span>Constraint (n)</span><span>Suitable Complexity</span></div>
+    <div class="crow"><span class="n">n ≤ 10</span><span class="c">O(n!), O(2ⁿ) bhi chal sakta hai</span></div>
+    <div class="crow"><span class="n">n ≤ 20</span><span class="c">O(2ⁿ)</span></div>
+    <div class="crow"><span class="n">n ≤ 100</span><span class="c">O(n³)</span></div>
+    <div class="crow"><span class="n">n ≤ 1000</span><span class="c">O(n²)</span></div>
+    <div class="crow"><span class="n">n ≤ 10⁵</span><span class="c">O(n log n) ya O(n)</span></div>
+    <div class="crow"><span class="n">n ≤ 10⁶</span><span class="c">O(n) ya O(log n)</span></div>
+    <div class="crow"><span class="n">n ≥ 10⁷</span><span class="c">O(log n) ya O(1)</span></div>
+  </div>
+
+  <footer>ye chart coding interviews aur DSA problems solve karte waqt complexity estimate karne ke liye reference hai</footer>
+
+</div>
+</body>
+</html>
